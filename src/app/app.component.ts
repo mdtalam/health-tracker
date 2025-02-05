@@ -10,8 +10,8 @@ import {
 
 @Component({
   selector: 'app-root',
-  standalone: true, // Mark this component as standalone
-  imports: [CommonModule, ReactiveFormsModule, FormsModule], // Import required Angular modules
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
@@ -59,20 +59,22 @@ export class AppComponent implements OnInit {
   filterTable() {
     let filtered = [...this.workouts];
 
+    // Filter by search query
     if (this.searchQuery) {
       filtered = filtered.filter((w) =>
         w.userName.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     }
 
+    // Filter by workout type
     if (this.filterType !== 'All') {
       filtered = filtered.filter((w) => w.workoutType === this.filterType);
     }
 
-    this.filteredWorkouts = filtered.slice(
-      (this.currentPage - 1) * this.itemsPerPage,
-      this.currentPage * this.itemsPerPage
-    );
+    // Paginate
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.filteredWorkouts = filtered.slice(startIndex, endIndex);
   }
 
   changePage(page: number) {
@@ -82,6 +84,11 @@ export class AppComponent implements OnInit {
 
   updateItemsPerPage(count: number) {
     this.itemsPerPage = count;
+    this.currentPage = 1; // Reset to first page
     this.filterTable();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.workouts.length / this.itemsPerPage);
   }
 }
